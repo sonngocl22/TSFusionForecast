@@ -63,5 +63,6 @@ df_xgb_test = pd.read_csv(os.path.join(results_test_dir, 'y_hat_df_xgb.csv'))
 df_gru_test = pd.read_csv(os.path.join(results_test_dir, 'y_hat_df_gru.csv'))
 df_lstm_test = pd.read_csv(os.path.join(results_test_dir, 'y_hat_df_lstm.csv'))
 
-
+print(df_arima_train.head())
+print(df_arima_test.head())
 
