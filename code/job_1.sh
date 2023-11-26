@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=tft
-#SBATCH --output=logs/tft%j.log
-#SBATCH --error=logs/tft%j.err
+#SBATCH --job-name=tft1
+#SBATCH --output=logs/tft1-%j.log
+#SBATCH --error=logs/tft1-%j.err
 #SBATCH --mail-user=le004@uni-hildesheim.de
-#SBATCH --partition=NGPU,GPU,STUD
+#SBATCH --partition=NGPU,GPU
 #SBATCH --gres=gpu:1
 #SBATCH --exclude=gpu-120
 

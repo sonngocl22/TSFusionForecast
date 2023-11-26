@@ -8,7 +8,7 @@ echo "Executing job generator"
 echo ""  #Echo new line
 
 # Define the number of jobs
-NUM_JOBS=2
+NUM_JOBS=1
 
 # Loop to create and submit jobs
 for i in $(seq 1 $NUM_JOBS); do
@@ -26,14 +26,14 @@ for i in $(seq 1 $NUM_JOBS); do
 #SBATCH --gres=gpu:1
 #SBATCH --exclude=gpu-120
 
-srun python /home/le004/master_thesis/git/TSFusionForecast/code/TFT_m4_tune_train.py --job-index $i --total-jobs $NUM_JOBS
+srun python /home/le004/master_thesis/git/TSFusionForecast/code/TFT_m4_cluster_tune.py --job-index $i --total-jobs $NUM_JOBS
 EOF
 
     # Submit the job
     sbatch $JOB_FILE
 
-        # Delete the job file
-    rm $JOB_FILE
+    # Delete the job file
+    #rm $JOB_FILE
 
 done
 
