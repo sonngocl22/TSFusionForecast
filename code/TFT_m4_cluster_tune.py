@@ -49,8 +49,8 @@ args = parser.parse_args()
 
 # tuning parameters
 batch_size = 64
-n_trials = 1
-max_epochs = 10
+n_trials = 100
+max_epochs = 50
 gradient_clip_val_range=(0.1, 1.0)
 hidden_size_range=(50, 200)
 hidden_continuous_size_range=(50, 200)
@@ -95,108 +95,108 @@ if args.job_index == args.total_jobs:
 print(f'start job {args.job_index}: {start_index}')
 print(f'end job {args.job_index}: {end_index}')
 
-# for unique_id in unique_ids[start_index:end_index]:
+for unique_id in unique_ids[start_index:end_index]:
 
-#     print(f'Currently training: {unique_id}')
+    print(f'Currently training: {unique_id}')
 
-#     df_base_models_train= pd.DataFrame({
-#     'unique_id' : df_arima_train.unique_id,
-#     'y_arima' : df_arima_train.y_hat,
-#     'y_theta' : df_theta_train.y_hat,
-#     'y_xgb' : df_xgb_train.y,
-#     'y_gru' : df_gru_train.y_hat,
-#     'y_lstm' : df_lstm_train.y_hat
-#     })
+    df_base_models_train= pd.DataFrame({
+    'unique_id' : df_arima_train.unique_id,
+    'y_arima' : df_arima_train.y_hat,
+    'y_theta' : df_theta_train.y_hat,
+    'y_xgb' : df_xgb_train.y,
+    'y_gru' : df_gru_train.y_hat,
+    'y_lstm' : df_lstm_train.y_hat
+    })
 
-#     df_base_models_test= pd.DataFrame({
-#     'unique_id' : df_arima_test.unique_id,
-#     'y_arima' : df_arima_test.y_hat,
-#     'y_theta' : df_theta_test.y_hat,
-#     'y_xgb' : df_xgb_test.y_hat,
-#     'y_gru' : df_gru_test.y_hat,
-#     'y_lstm' : df_lstm_test.y_hat
-#     })
+    df_base_models_test= pd.DataFrame({
+    'unique_id' : df_arima_test.unique_id,
+    'y_arima' : df_arima_test.y_hat,
+    'y_theta' : df_theta_test.y_hat,
+    'y_xgb' : df_xgb_test.y_hat,
+    'y_gru' : df_gru_test.y_hat,
+    'y_lstm' : df_lstm_test.y_hat
+    })
 
-#     # Filter data for the current series (train and val data)
-#     df = y_train_df[y_train_df['unique_id'] == unique_id].copy()
-#     df['ds'] = (df['ds'] - df['ds'].min()).dt.total_seconds() // 3600
-#     df['ds'] = df['ds'].astype(int)
-#     df_train_val = pd.concat([df.iloc[-24*7:].reset_index(drop=True).drop(columns=['unique_id']), 
-#                               df_base_models_train[df_base_models_train['unique_id']==unique_id].reset_index(drop=True)], axis=1)
+    # Filter data for the current series (train and val data)
+    df = y_train_df[y_train_df['unique_id'] == unique_id].copy()
+    df['ds'] = (df['ds'] - df['ds'].min()).dt.total_seconds() // 3600
+    df['ds'] = df['ds'].astype(int)
+    df_train_val = pd.concat([df.iloc[-24*7:].reset_index(drop=True).drop(columns=['unique_id']), 
+                              df_base_models_train[df_base_models_train['unique_id']==unique_id].reset_index(drop=True)], axis=1)
     
-#     # Test data
-#     df = y_test_df.drop(columns=['y_hat_naive2'])[y_test_df['unique_id'] == unique_id].copy()
-#     df['ds'] = (df['ds'] - df['ds'].min()).dt.total_seconds() // 3600 + df_train_val['ds'].max() + 1  #700
-#     df['ds'] = df['ds'].astype(int)
-#     df_test = pd.concat([df.reset_index(drop=True).drop(columns=['unique_id']), 
-#                          df_base_models_test[df_base_models_test['unique_id']==unique_id].reset_index(drop=True)], axis=1)
+    # Test data
+    df = y_test_df.drop(columns=['y_hat_naive2'])[y_test_df['unique_id'] == unique_id].copy()
+    df['ds'] = (df['ds'] - df['ds'].min()).dt.total_seconds() // 3600 + df_train_val['ds'].max() + 1  #700
+    df['ds'] = df['ds'].astype(int)
+    df_test = pd.concat([df.reset_index(drop=True).drop(columns=['unique_id']), 
+                         df_base_models_test[df_base_models_test['unique_id']==unique_id].reset_index(drop=True)], axis=1)
 
-#     # Create the TimeSeriesDataSet for training
-#     max_encoder_length = 24*7
-#     max_prediction_length = 48
+    # Create the TimeSeriesDataSet for training
+    max_encoder_length = 24*7
+    max_prediction_length = 48
 
-#     training = TimeSeriesDataSet(
-#         df_train_val.iloc[:-max_prediction_length],
-#         time_idx="ds",
-#         target="y",
-#         group_ids=['unique_id'],
-#         max_encoder_length=max_encoder_length,
-#         # min_encoder_length=max_encoder_length // 2,
-#         min_encoder_length=1,
-#         max_prediction_length=max_prediction_length,
-#         # min_prediction_length=max_prediction_length // 2,
-#         min_prediction_length=1,
-#         time_varying_known_reals=['y_arima', 'y_theta', 'y_xgb', 'y_gru', 'y_lstm'],  # Base model forecasts
-#         target_normalizer=GroupNormalizer(
-#             groups=["unique_id"], transformation="softplus"
-#         ),
-#         add_relative_time_idx=True,
-#         add_target_scales=True,
-#         add_encoder_length=True,
-#         # allow_missing_timesteps=True
-#         )
+    training = TimeSeriesDataSet(
+        df_train_val.iloc[:-max_prediction_length],
+        time_idx="ds",
+        target="y",
+        group_ids=['unique_id'],
+        max_encoder_length=max_encoder_length,
+        # min_encoder_length=max_encoder_length // 2,
+        min_encoder_length=1,
+        max_prediction_length=max_prediction_length,
+        # min_prediction_length=max_prediction_length // 2,
+        min_prediction_length=1,
+        time_varying_known_reals=['y_arima', 'y_theta', 'y_xgb', 'y_gru', 'y_lstm'],  # Base model forecasts
+        target_normalizer=GroupNormalizer(
+            groups=["unique_id"], transformation="softplus"
+        ),
+        add_relative_time_idx=True,
+        add_target_scales=True,
+        add_encoder_length=True,
+        # allow_missing_timesteps=True
+        )
     
-#     validation = TimeSeriesDataSet.from_dataset(training, df_train_val, predict=True, stop_randomization=True)
+    validation = TimeSeriesDataSet.from_dataset(training, df_train_val, predict=True, stop_randomization=True)
 
-#     # creating the test data that includes the encoder and decoder data
-#     encoder_data = df_train_val[lambda x: x.ds > x.ds.max() - max_encoder_length]
-#     df_test.y = df_train_val.y[df_train_val.ds == df_train_val.ds.max()].values[0]
-#     decoder_data = df_test
-#     new_prediction_data = pd.concat([encoder_data, decoder_data], ignore_index=True)
+    # creating the test data that includes the encoder and decoder data
+    encoder_data = df_train_val[lambda x: x.ds > x.ds.max() - max_encoder_length]
+    df_test.y = df_train_val.y[df_train_val.ds == df_train_val.ds.max()].values[0]
+    decoder_data = df_test
+    new_prediction_data = pd.concat([encoder_data, decoder_data], ignore_index=True)
 
-#     batch_size = batch_size  # set this between 32 to 128
-#     train_dataloader = training.to_dataloader(train=True, batch_size=batch_size, num_workers=0)
-#     val_dataloader = validation.to_dataloader(train=False, batch_size=batch_size * 10, num_workers=0)
+    batch_size = batch_size  # set this between 32 to 128
+    train_dataloader = training.to_dataloader(train=True, batch_size=batch_size, num_workers=0)
+    val_dataloader = validation.to_dataloader(train=False, batch_size=batch_size * 10, num_workers=0)
 
-#     ### TUNING
-#     best_params = {}
-#     print(f'Tuning has started for {unique_id}...')
-#     study = optimize_hyperparameters(
-#         train_dataloader,
-#         val_dataloader,
-#         model_path="optuna_tune_test",
-#         n_trials = n_trials,
-#         max_epochs = max_epochs,
-#         gradient_clip_val_range=gradient_clip_val_range,
-#         hidden_size_range=hidden_size_range,
-#         hidden_continuous_size_range=hidden_continuous_size_range,
-#         attention_head_size_range=attention_head_size_range,
-#         learning_rate_range=learning_rate_range,
-#         dropout_range=dropout_range,
-#         trainer_kwargs=dict(limit_train_batches=30,
-#                             enable_checkpointing=False,
-#                             callbacks=[]),
-#         reduce_on_plateau_patience=4,
-#         use_learning_rate_finder=False,
-#     )
+    ### TUNING
+    best_params = {}
+    print(f'Tuning has started for {unique_id}...')
+    study = optimize_hyperparameters(
+        train_dataloader,
+        val_dataloader,
+        model_path="optuna_tune_test",
+        n_trials = n_trials,
+        max_epochs = max_epochs,
+        gradient_clip_val_range=gradient_clip_val_range,
+        hidden_size_range=hidden_size_range,
+        hidden_continuous_size_range=hidden_continuous_size_range,
+        attention_head_size_range=attention_head_size_range,
+        learning_rate_range=learning_rate_range,
+        dropout_range=dropout_range,
+        trainer_kwargs=dict(limit_train_batches=30,
+                            enable_checkpointing=False,
+                            callbacks=[]),
+        reduce_on_plateau_patience=4,
+        use_learning_rate_finder=False,
+    )
 
-#     with open(os.path.join(best_params_dir, f"study_{unique_id}.pkl"), "wb") as fout:
-#         pickle.dump(study, fout)
+    with open(os.path.join(best_params_dir, f"study_{unique_id}.pkl"), "wb") as fout:
+        pickle.dump(study, fout)
 
-#     print(f'Tuning done! Best params for {unique_id}: ')
-#     print(study.best_trial.params)
+    print(f'Tuning done! Best params for {unique_id}: ')
+    print(study.best_trial.params)
 
-#     ### END TUNING
+    ### END TUNING
 
 
 
