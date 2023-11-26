@@ -1,27 +1,26 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=job-generator
 #SBATCH --output=logs/job-generator_%j.log
-#SBATCH --partition=TEST
+#SBATCH --partition=NGPU,GPU,STUD,TEST
 
 #Echo bash info
-echo "Executing generator bash"
+echo "Executing job generator"
 echo ""  #Echo new line
 
 # Define the number of jobs
-NUM_JOBS=10
+NUM_JOBS=2
 
 # Loop to create and submit jobs
 for i in $(seq 1 $NUM_JOBS); do
 
-    JOB_FILE="job_$i.slurm"
+    JOB_FILE="job_$i.sh"
 
     # Create a SLURM job file
-    cat <<EOF > job_$i.slurm
-
+    cat <<EOF > $JOB_FILE
 #!/usr/bin/env bash
-#SBATCH --job-name=tft_tune$i
-#SBATCH --output=logs/tft_tune$i_%j.log
-#SBATCH --error=logs/tft_tune$i_%j.err
+#SBATCH --job-name=tft$i
+#SBATCH --output=logs/tft$i-%j.log
+#SBATCH --error=logs/tft$i-%j.err
 #SBATCH --mail-user=le004@uni-hildesheim.de
 #SBATCH --partition=NGPU,GPU
 #SBATCH --gres=gpu:1
