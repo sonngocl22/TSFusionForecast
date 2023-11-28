@@ -49,14 +49,14 @@ args = parser.parse_args()
 
 # tuning parameters
 batch_size = 64
-n_trials = 100
-max_epochs = 50
+n_trials = 200
+max_epochs = 60
 gradient_clip_val_range=(0.1, 1.0)
-hidden_size_range=(50, 200)
-hidden_continuous_size_range=(50, 200)
+hidden_size_range=(50, 250)
+hidden_continuous_size_range=(50, 250)
 attention_head_size_range=(1, 4)
 learning_rate_range=(0.001, 0.1)
-dropout_range=(0.1, 0.3)
+dropout_range=(0.1, 0.5)
 
 # loading datasets
 X_train_df, y_train_df, X_test_df, y_test_df = prepare_m4_data(dataset_name="Hourly",
@@ -183,10 +183,10 @@ for unique_id in unique_ids[start_index:end_index]:
         attention_head_size_range=attention_head_size_range,
         learning_rate_range=learning_rate_range,
         dropout_range=dropout_range,
-        trainer_kwargs=dict(limit_train_batches=30,
+        trainer_kwargs=dict(limit_train_batches=50,
                             enable_checkpointing=False,
                             callbacks=[]),
-        reduce_on_plateau_patience=4,
+        reduce_on_plateau_patience=6,
         use_learning_rate_finder=False,
     )
 
