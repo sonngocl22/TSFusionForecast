@@ -22,7 +22,7 @@ for i in $(seq 1 $NUM_JOBS); do
 #SBATCH --output=logs/tft$i-%j.log
 #SBATCH --error=logs/tft$i-%j.err
 #SBATCH --mail-user=le004@uni-hildesheim.de
-#SBATCH --partition=NGPU,GPU
+#SBATCH --partition=GPU
 #SBATCH --gres=gpu:1
 #SBATCH --exclude=gpu-120
 

@@ -39,7 +39,7 @@ data_dir = os.path.join(base_dir, 'data')
 results_dir = os.path.join(base_dir, 'results')
 best_params_dir = os.path.join(code_dir, 'best_params')
 os.makedirs(best_params_dir, exist_ok=True)
-pl.seed_everything(42)
+pl.seed_everything(1337)
 
 # parsing arguments (args.job_index and args.total_jobs)
 parser = argparse.ArgumentParser()
@@ -48,15 +48,15 @@ parser.add_argument('--total-jobs', type=int, required=True, help='Total number 
 args = parser.parse_args()
 
 # tuning parameters
-batch_size = 64
-n_trials = 200
-max_epochs = 60
+batch_size = 128
+n_trials = 150
+max_epochs = 50
 gradient_clip_val_range=(0.1, 1.0)
-hidden_size_range=(50, 250)
-hidden_continuous_size_range=(50, 250)
+hidden_size_range=(10, 150)
+hidden_continuous_size_range=(10, 150)
 attention_head_size_range=(1, 4)
 learning_rate_range=(0.001, 0.1)
-dropout_range=(0.1, 0.5)
+dropout_range=(0.1, 0.4)
 
 # loading datasets
 X_train_df, y_train_df, X_test_df, y_test_df = prepare_m4_data(dataset_name="Hourly",
@@ -186,7 +186,7 @@ for unique_id in unique_ids[start_index:end_index]:
         trainer_kwargs=dict(limit_train_batches=50,
                             enable_checkpointing=False,
                             callbacks=[]),
-        reduce_on_plateau_patience=6,
+        reduce_on_plateau_patience=5,
         use_learning_rate_finder=False,
     )
 
