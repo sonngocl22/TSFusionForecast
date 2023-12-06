@@ -3,7 +3,11 @@
 #SBATCH --output=logs/train_tuned%j.log
 #SBATCH --error=logs/train_tuned%j.err
 #SBATCH --mail-user=le004@uni-hildesheim.de
+<<<<<<< HEAD
 #SBATCH --partition=NGPU,GPU
+=======
+#SBATCH --partition=NGPU,GPU,STUD
+>>>>>>> 0729ab6fc9f6cbd20f5047895e40aa08cb2de51a
 #SBATCH --gres=gpu:1
 #SBATCH --exclude=gpu-120
 
