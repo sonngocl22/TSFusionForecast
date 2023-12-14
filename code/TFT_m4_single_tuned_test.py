@@ -78,7 +78,7 @@ with open(os.path.join(best_params_dir, f"study_H1.pkl"), 'rb') as fin:
     study = pickle.load(fin)
 best_params = study.best_trial.params
 
-for unique_id in ['H1', 'H10']:
+for unique_id in unique_ids:
 
     print(f'Currently training: {unique_id}')
 
