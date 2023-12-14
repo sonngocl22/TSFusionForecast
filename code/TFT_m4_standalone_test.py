@@ -43,8 +43,8 @@ pl.seed_everything(42)
 
 # setting parameters
 batch_size = 64
-patience = 100
-max_epochs = 200
+patience = 80
+max_epochs = 150
 
 # loading datasets
 X_train_df, y_train_df, X_test_df, y_test_df = prepare_m4_data(dataset_name="Hourly",
@@ -62,7 +62,8 @@ for unique_id in unique_ids:
     df = y_train_df[y_train_df['unique_id'] == unique_id].copy()
     df['ds'] = (df['ds'] - df['ds'].min()).dt.total_seconds() // 3600
     df['ds'] = df['ds'].astype(int)
-    df_train_val = df.iloc[-24*7:].reset_index(drop=True)
+    df_train_val = df.reset_index(drop=True)
+    # df_train_val = df.iloc[-24*7:].reset_index(drop=True)
     
     # Test data
     df = y_test_df.drop(columns=['y_hat_naive2'])[y_test_df['unique_id'] == unique_id].copy()
@@ -139,7 +140,7 @@ for unique_id in unique_ids:
         loss=SMAPE(),
         # log_interval=10,  # uncomment for learning rate finder and otherwise, e.g. to 10 for logging every 10 batches
         optimizer="Ranger",
-        reduce_on_plateau_patience=4,
+        reduce_on_plateau_patience=5,
     )
 
     trainer.fit(
