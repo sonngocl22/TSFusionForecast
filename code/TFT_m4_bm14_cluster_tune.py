@@ -82,6 +82,8 @@ df_xgb_test = pd.read_csv(os.path.join(results_test_dir, 'y_hat_df_xgb.csv'))
 df_gru_test = pd.read_csv(os.path.join(results_test_dir, 'y_hat_df_gru.csv'))
 df_lstm_test = pd.read_csv(os.path.join(results_test_dir, 'y_hat_df_lstm.csv'))
 
+# getting the most relevant training size
+train_window = len(df_arima_train[df_arima_train['unique_id']=='H1']) # 48*7
 
 # getting job indexes
 total_datasets = len(unique_ids)
@@ -121,7 +123,7 @@ for unique_id in unique_ids[start_index:end_index]:
     df = y_train_df[y_train_df['unique_id'] == unique_id].copy()
     df['ds'] = (df['ds'] - df['ds'].min()).dt.total_seconds() // 3600
     df['ds'] = df['ds'].astype(int)
-    df_train_val = pd.concat([df.iloc[-24*7:].reset_index(drop=True).drop(columns=['unique_id']), 
+    df_train_val = pd.concat([df.iloc[-train_window:].reset_index(drop=True).drop(columns=['unique_id']), 
                               df_base_models_train[df_base_models_train['unique_id']==unique_id].reset_index(drop=True)], axis=1)
     
     # Test data
