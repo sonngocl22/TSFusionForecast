@@ -26,7 +26,7 @@ for i in $(seq 1 $NUM_JOBS); do
 #SBATCH --gres=gpu:1
 #SBATCH --exclude=gpu-120
 
-python /home/le004/master_thesis/git/TSFusionForecast/code/TFT_m4_cluster_tune.py --job-index $i --total-jobs $NUM_JOBS
+python /home/le004/master_thesis/git/TSFusionForecast/code/TFT_m4_bm14_cluster_tune.py --job-index $i --total-jobs $NUM_JOBS
 EOF
 
     # Submit the job
