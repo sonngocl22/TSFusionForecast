@@ -48,12 +48,12 @@ parser.add_argument('--total-jobs', type=int, required=True, help='Total number 
 args = parser.parse_args()
 
 # tuning parameters
-batch_size = 128
-n_trials = 150
+batch_size = 64
+n_trials = 50
 max_epochs = 50
 gradient_clip_val_range=(0.1, 1.0)
-hidden_size_range=(8, 160)
-hidden_continuous_size_range=(8, 160)
+hidden_size_range=(5, 100)
+hidden_continuous_size_range=(5, 100)
 attention_head_size_range=(1, 4)
 learning_rate_range=(0.0005, 0.1)
 dropout_range=(0.1, 0.4)
@@ -189,7 +189,7 @@ for unique_id in unique_ids[start_index:end_index]:
         trainer_kwargs=dict(limit_train_batches=50,
                             enable_checkpointing=False,
                             callbacks=[]),
-        reduce_on_plateau_patience=10,
+        #reduce_on_plateau_patience=10,
         use_learning_rate_finder=False,
     )
 

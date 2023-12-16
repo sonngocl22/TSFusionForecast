@@ -1,7 +1,0 @@
-[rank: 0] Seed set to 1337
-Traceback (most recent call last):
-  File "/home/le004/master_thesis/git/TSFusionForecast/code/TFT_m4_cluster_tune.py", line 138, in <module>
-    training = TimeSeriesDataSet(
-  File "/home/le004/conda/anaconda3/envs/tsff_env/lib/python3.9/site-packages/pytorch_forecasting/data/timeseries.py", line 350, in __init__
-    assert data[time_idx].dtype.kind == "i", "Timeseries index should be of type integer"
-AssertionError: Timeseries index should be of type integer
