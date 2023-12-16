@@ -37,14 +37,14 @@ base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 code_dir = os.path.join(base_dir, 'code')
 data_dir = os.path.join(base_dir, 'data')
 results_dir = os.path.join(base_dir, 'results')
-best_params_dir = os.path.join(code_dir, 'best_params')
-os.makedirs(best_params_dir, exist_ok=True)
+best_params_dir = os.path.join(code_dir, 'best_params_bm14')
+# os.makedirs(best_params_dir, exist_ok=True)
 pl.seed_everything(42)
 
 # setting parameters
 batch_size = 64
-patience = 100
-max_epochs = 200
+patience = 50
+max_epochs = 150
 
 # loading datasets
 X_train_df, y_train_df, X_test_df, y_test_df = prepare_m4_data(dataset_name="Hourly",
@@ -70,7 +70,11 @@ df_xgb_test = pd.read_csv(os.path.join(results_test_dir, 'y_hat_df_xgb.csv'))
 df_gru_test = pd.read_csv(os.path.join(results_test_dir, 'y_hat_df_gru.csv'))
 df_lstm_test = pd.read_csv(os.path.join(results_test_dir, 'y_hat_df_lstm.csv'))
 
-for unique_id in unique_ids:
+# getting the most relevant training size
+train_window = len(df_arima_train[df_arima_train['unique_id']=='H1']) # 48*7
+
+# for unique_id in unique_ids:
+for unique_id in ['H1','H10']:
 
     print(f'Currently training: {unique_id}')
 
@@ -78,7 +82,7 @@ for unique_id in unique_ids:
     'unique_id' : df_arima_train.unique_id,
     'y_arima' : df_arima_train.y_hat,
     'y_theta' : df_theta_train.y_hat,
-    'y_xgb' : df_xgb_train.y,
+    'y_xgb' : df_xgb_train.y_hat,
     'y_gru' : df_gru_train.y_hat,
     'y_lstm' : df_lstm_train.y_hat
     })
@@ -96,7 +100,7 @@ for unique_id in unique_ids:
     df = y_train_df[y_train_df['unique_id'] == unique_id].copy()
     df['ds'] = (df['ds'] - df['ds'].min()).dt.total_seconds() // 3600
     df['ds'] = df['ds'].astype(int)
-    df_train_val = pd.concat([df.iloc[-24*7:].reset_index(drop=True).drop(columns=['unique_id']), 
+    df_train_val = pd.concat([df.iloc[-train_window:].reset_index(drop=True).drop(columns=['unique_id']), 
                               df_base_models_train[df_base_models_train['unique_id']==unique_id].reset_index(drop=True)], axis=1)
     
     # Test data
@@ -108,6 +112,7 @@ for unique_id in unique_ids:
 
     # Create the TimeSeriesDataSet for training
     max_encoder_length = 24*7
+    # min_encoder_length = 48
     max_prediction_length = 48
 
     training = TimeSeriesDataSet(
@@ -116,11 +121,12 @@ for unique_id in unique_ids:
         target="y",
         group_ids=['unique_id'],
         max_encoder_length=max_encoder_length,
-        # min_encoder_length=max_encoder_length // 2,
-        min_encoder_length=1,
+        # min_encoder_length=min_encoder_length,
+        min_encoder_length=max_encoder_length // 2,
+        # min_encoder_length=1,
         max_prediction_length=max_prediction_length,
         # min_prediction_length=max_prediction_length // 2,
-        min_prediction_length=1,
+        # min_prediction_length=1,
         time_varying_known_reals=['y_arima', 'y_theta', 'y_xgb', 'y_gru', 'y_lstm'],  # Base model forecasts
         target_normalizer=GroupNormalizer(
             groups=["unique_id"], transformation="softplus"
@@ -175,9 +181,10 @@ for unique_id in unique_ids:
         loss=SMAPE(),
         # log_interval=10,  # uncomment for learning rate finder and otherwise, e.g. to 10 for logging every 10 batches
         optimizer="Ranger",
-        reduce_on_plateau_patience=4,
+        # reduce_on_plateau_patience=20,
     )
 
+    print(best_params)
 
     trainer.fit(
     tft,
@@ -186,9 +193,13 @@ for unique_id in unique_ids:
     )
 
     new_raw_predictions = tft.predict(new_prediction_data, mode="raw", return_x=True, trainer_kwargs=dict(accelerator="gpu"))
-    all_forecasts[unique_id] = new_raw_predictions.output.prediction.cpu().numpy().flatten()
+    prediction_array = new_raw_predictions.output.prediction.cpu().numpy().flatten()
+    all_forecasts[unique_id] = prediction_array
 
-    # print(all_forecasts)
+    # y = y_test_df[y_test_df['unique_id'] == unique_id].y.to_numpy()
+    # print(np.sqrt(((y - prediction_array)**2).sum()))
+
+# print(all_forecasts)
 
 results_save_dir = os.path.join(results_dir, 'm4', 'TFT', 'test')
 df_save = pd.DataFrame(all_forecasts).melt()
