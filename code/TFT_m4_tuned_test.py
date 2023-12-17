@@ -73,8 +73,8 @@ df_lstm_test = pd.read_csv(os.path.join(results_test_dir, 'y_hat_df_lstm.csv'))
 # getting the most relevant training size
 train_window = len(df_arima_train[df_arima_train['unique_id']=='H1']) # 48*7
 
-# for unique_id in unique_ids:
-for unique_id in ['H1','H10']:
+for unique_id in unique_ids:
+# for unique_id in ['H1','H10']:
 
     print(f'Currently training: {unique_id}')
 
@@ -204,4 +204,4 @@ for unique_id in ['H1','H10']:
 results_save_dir = os.path.join(results_dir, 'm4', 'TFT', 'test')
 df_save = pd.DataFrame(all_forecasts).melt()
 df_save.rename(columns={'variable' : 'unique_id', 'value': 'y_hat'}, inplace=True)
-df_save.to_csv(os.path.join(results_save_dir, 'y_hat_df_tft_bm7_tuned_2.csv'), index=False)
+df_save.to_csv(os.path.join(results_save_dir, 'y_hat_df_tft_bm14_tuned.csv'), index=False)
