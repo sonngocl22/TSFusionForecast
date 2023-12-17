@@ -103,7 +103,7 @@ for unique_id in unique_ids[start_index:end_index]:
     'unique_id' : df_arima_train.unique_id,
     'y_arima' : df_arima_train.y_hat,
     'y_theta' : df_theta_train.y_hat,
-    'y_xgb' : df_xgb_train.y,
+    'y_xgb' : df_xgb_train.y_hat,
     'y_gru' : df_gru_train.y_hat,
     'y_lstm' : df_lstm_train.y_hat
     })

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=tft_train_tuned
+#SBATCH --job-name=TFT_tuned_bm14
 #SBATCH --output=logs/train_tuned%j.log
 #SBATCH --error=logs/train_tuned%j.err
 #SBATCH --mail-user=le004@uni-hildesheim.de
-#SBATCH --partition=NGPU,GPU,STUD
+#SBATCH --partition=GPU
 #SBATCH --gres=gpu:1
 #SBATCH --exclude=gpu-120
 
