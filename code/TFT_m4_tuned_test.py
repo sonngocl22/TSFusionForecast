@@ -39,12 +39,12 @@ data_dir = os.path.join(base_dir, 'data')
 results_dir = os.path.join(base_dir, 'results')
 best_params_dir = os.path.join(code_dir, 'best_params_bm14')
 # os.makedirs(best_params_dir, exist_ok=True)
-pl.seed_everything(42)
+pl.seed_everything(22)
 
 # setting parameters
 batch_size = 64
 patience = 50
-max_epochs = 150
+max_epochs = 200
 
 # loading datasets
 X_train_df, y_train_df, X_test_df, y_test_df = prepare_m4_data(dataset_name="Hourly",
@@ -73,8 +73,8 @@ df_lstm_test = pd.read_csv(os.path.join(results_test_dir, 'y_hat_df_lstm.csv'))
 # getting the most relevant training size
 train_window = len(df_arima_train[df_arima_train['unique_id']=='H1']) # 48*7
 
-for unique_id in unique_ids:
-# for unique_id in ['H1','H10']:
+# for unique_id in unique_ids:
+for unique_id in ['H1','H10']:
 
     print(f'Currently training: {unique_id}')
 
@@ -181,7 +181,7 @@ for unique_id in unique_ids:
         loss=SMAPE(),
         # log_interval=10,  # uncomment for learning rate finder and otherwise, e.g. to 10 for logging every 10 batches
         optimizer="Ranger",
-        # reduce_on_plateau_patience=20,
+        reduce_on_plateau_patience=20,
     )
 
     print(best_params)
@@ -196,12 +196,12 @@ for unique_id in unique_ids:
     prediction_array = new_raw_predictions.output.prediction.cpu().numpy().flatten()
     all_forecasts[unique_id] = prediction_array
 
-#     y = y_test_df[y_test_df['unique_id'] == unique_id].y.to_numpy()
-#     print(np.sqrt(((y - prediction_array)**2).sum()))
+    y = y_test_df[y_test_df['unique_id'] == unique_id].y.to_numpy()
+    print(np.sqrt(((y - prediction_array)**2).sum()))
 
-# print(all_forecasts)
+print(all_forecasts)
 
-results_save_dir = os.path.join(results_dir, 'm4', 'TFT', 'test')
-df_save = pd.DataFrame(all_forecasts).melt()
-df_save.rename(columns={'variable' : 'unique_id', 'value': 'y_hat'}, inplace=True)
-df_save.to_csv(os.path.join(results_save_dir, 'y_hat_df_tft_bm14_tuned.csv'), index=False)
+# results_save_dir = os.path.join(results_dir, 'm4', 'TFT', 'test')
+# df_save = pd.DataFrame(all_forecasts).melt()
+# df_save.rename(columns={'variable' : 'unique_id', 'value': 'y_hat'}, inplace=True)
+# df_save.to_csv(os.path.join(results_save_dir, 'y_hat_df_tft_bm14_tuned.csv'), index=False)
