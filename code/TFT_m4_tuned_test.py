@@ -111,7 +111,7 @@ for unique_id in unique_ids:
                          df_base_models_test[df_base_models_test['unique_id']==unique_id].reset_index(drop=True)], axis=1)
 
     # Create the TimeSeriesDataSet for training
-    max_encoder_length = 24*7
+    max_encoder_length = 48
     # min_encoder_length = 48
     max_prediction_length = 48
 
@@ -125,7 +125,7 @@ for unique_id in unique_ids:
         min_encoder_length=max_encoder_length // 2,
         # min_encoder_length=1,
         max_prediction_length=max_prediction_length,
-        # min_prediction_length=max_prediction_length // 2,
+        min_prediction_length=max_prediction_length // 2,
         # min_prediction_length=1,
         time_varying_known_reals=['y_arima', 'y_theta', 'y_xgb', 'y_gru', 'y_lstm'],  # Base model forecasts
         target_normalizer=GroupNormalizer(
@@ -196,8 +196,8 @@ for unique_id in unique_ids:
     prediction_array = new_raw_predictions.output.prediction.cpu().numpy().flatten()
     all_forecasts[unique_id] = prediction_array
 
-    # y = y_test_df[y_test_df['unique_id'] == unique_id].y.to_numpy()
-    # print(np.sqrt(((y - prediction_array)**2).sum()))
+#     y = y_test_df[y_test_df['unique_id'] == unique_id].y.to_numpy()
+#     print(np.sqrt(((y - prediction_array)**2).sum()))
 
 # print(all_forecasts)
 
