@@ -73,8 +73,8 @@ df_lstm_test = pd.read_csv(os.path.join(results_test_dir, 'y_hat_df_lstm.csv'))
 # getting the most relevant training size
 train_window = len(df_arima_train[df_arima_train['unique_id']=='H1']) # 48*7
 
-# for unique_id in unique_ids:
-for unique_id in ['H1','H10']:
+for unique_id in unique_ids:
+# for unique_id in ['H1','H10']:
 
     print(f'Currently training: {unique_id}')
 
@@ -199,9 +199,10 @@ for unique_id in ['H1','H10']:
     y = y_test_df[y_test_df['unique_id'] == unique_id].y.to_numpy()
     print(np.sqrt(((y - prediction_array)**2).sum()))
 
-print(all_forecasts)
+#print(all_forecasts)
 
-# results_save_dir = os.path.join(results_dir, 'm4', 'TFT', 'test')
-# df_save = pd.DataFrame(all_forecasts).melt()
-# df_save.rename(columns={'variable' : 'unique_id', 'value': 'y_hat'}, inplace=True)
-# df_save.to_csv(os.path.join(results_save_dir, 'y_hat_df_tft_bm14_tuned.csv'), index=False)
+results_save_dir = os.path.join(results_dir, 'm4', 'TFT', 'test')
+df_save = pd.DataFrame(all_forecasts).melt()
+df_save.rename(columns={'variable' : 'unique_id', 'value': 'y_hat'}, inplace=True)
+df_save['ds'] = X_test_df['ds']
+df_save.to_csv(os.path.join(results_save_dir, 'y_hat_df_tft_bm14_tuned_final.csv'), index=False)
