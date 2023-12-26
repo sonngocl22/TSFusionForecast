@@ -48,15 +48,16 @@ parser.add_argument('--total-jobs', type=int, required=True, help='Total number 
 args = parser.parse_args()
 
 # tuning parameters
+patience = 50
 batch_size = 64
 n_trials = 50
-max_epochs = 50
+max_epochs = 150
 gradient_clip_val_range=(0.1, 1.0)
-hidden_size_range=(5, 100)
-hidden_continuous_size_range=(5, 100)
+hidden_size_range=(5, 150)
+hidden_continuous_size_range=(5, 150)
 attention_head_size_range=(1, 4)
 learning_rate_range=(0.0005, 0.1)
-dropout_range=(0.1, 0.4)
+dropout_range=(0.1, 0.5)
 
 # loading datasets
 X_train_df, y_train_df, X_test_df, y_test_df = prepare_m4_data(dataset_name="Hourly",
@@ -147,15 +148,15 @@ for unique_id in unique_ids[start_index:end_index]:
         min_encoder_length=min_encoder_length,
         # min_encoder_length=1,
         max_prediction_length=max_prediction_length,
-        # min_prediction_length=max_prediction_length // 2,
+        min_prediction_length=max_prediction_length // 2,
         # min_prediction_length=1,
         time_varying_known_reals=['y_arima', 'y_theta', 'y_xgb', 'y_gru', 'y_lstm'],  # Base model forecasts
         target_normalizer=GroupNormalizer(
             groups=["unique_id"], transformation="softplus"
         ),
-        add_relative_time_idx=False,
-        add_target_scales=False,
-        add_encoder_length=False,
+        add_relative_time_idx=True,
+        add_target_scales=True,
+        add_encoder_length=True,
         # allow_missing_timesteps=True
         )
     
@@ -170,6 +171,9 @@ for unique_id in unique_ids[start_index:end_index]:
     batch_size = batch_size  # set this between 32 to 128
     train_dataloader = training.to_dataloader(train=True, batch_size=batch_size, num_workers=0)
     val_dataloader = validation.to_dataloader(train=False, batch_size=batch_size * 10, num_workers=0)
+
+    # configure network and trainer
+    early_stop_callback = EarlyStopping(monitor="val_loss", min_delta=1e-5, patience=patience, verbose=False, mode="min")
 
     ### TUNING
     best_params = {}
@@ -186,10 +190,10 @@ for unique_id in unique_ids[start_index:end_index]:
         attention_head_size_range=attention_head_size_range,
         learning_rate_range=learning_rate_range,
         dropout_range=dropout_range,
-        trainer_kwargs=dict(limit_train_batches=50,
+        trainer_kwargs=dict(#limit_train_batches=50,
                             enable_checkpointing=False,
-                            callbacks=[]),
-        #reduce_on_plateau_patience=10,
+                            callbacks=[early_stop_callback]),
+        reduce_on_plateau_patience=10,
         use_learning_rate_finder=False,
     )
 

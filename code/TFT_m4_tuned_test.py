@@ -44,7 +44,7 @@ pl.seed_everything(22)
 # setting parameters
 batch_size = 64
 patience = 50
-max_epochs = 200
+max_epochs = 150
 
 # loading datasets
 X_train_df, y_train_df, X_test_df, y_test_df = prepare_m4_data(dataset_name="Hourly",
@@ -111,8 +111,8 @@ for unique_id in unique_ids:
                          df_base_models_test[df_base_models_test['unique_id']==unique_id].reset_index(drop=True)], axis=1)
 
     # Create the TimeSeriesDataSet for training
-    max_encoder_length = 48
-    # min_encoder_length = 48
+    max_encoder_length = 48*7
+    min_encoder_length = 48
     max_prediction_length = 48
 
     training = TimeSeriesDataSet(
@@ -121,8 +121,8 @@ for unique_id in unique_ids:
         target="y",
         group_ids=['unique_id'],
         max_encoder_length=max_encoder_length,
-        # min_encoder_length=min_encoder_length,
-        min_encoder_length=max_encoder_length // 2,
+        min_encoder_length=min_encoder_length,
+        # min_encoder_length=max_encoder_length // 2,
         # min_encoder_length=1,
         max_prediction_length=max_prediction_length,
         min_prediction_length=max_prediction_length // 2,
@@ -163,7 +163,7 @@ for unique_id in unique_ids:
         max_epochs=max_epochs,
         accelerator="gpu",
         gradient_clip_val=best_params['gradient_clip_val'],
-        limit_train_batches=50,  # coment in for training, running valiation every 30 batches
+        # limit_train_batches=50,  # coment in for training, running valiation every 30 batches
         # fast_dev_run=True,  # comment in to check that networkor dataset has no serious bugs
         callbacks=[early_stop_callback],
         logger=False,
@@ -181,7 +181,7 @@ for unique_id in unique_ids:
         loss=SMAPE(),
         # log_interval=10,  # uncomment for learning rate finder and otherwise, e.g. to 10 for logging every 10 batches
         optimizer="Ranger",
-        reduce_on_plateau_patience=20,
+        reduce_on_plateau_patience=10,
     )
 
     print(best_params)
