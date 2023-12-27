@@ -37,13 +37,13 @@ base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 code_dir = os.path.join(base_dir, 'code')
 data_dir = os.path.join(base_dir, 'data')
 results_dir = os.path.join(base_dir, 'results')
-best_params_dir = os.path.join(code_dir, 'best_params_bm7')
+best_params_dir = os.path.join(code_dir, 'best_params_old')
 # os.makedirs(best_params_dir, exist_ok=True)
 pl.seed_everything(22)
 
 # setting parameters
-batch_size = 64
-patience = 50
+batch_size = 128
+patience = 75
 max_epochs = 150
 
 # loading datasets
@@ -111,8 +111,8 @@ for unique_id in unique_ids:
                          df_base_models_test[df_base_models_test['unique_id']==unique_id].reset_index(drop=True)], axis=1)
 
     # Create the TimeSeriesDataSet for training
-    max_encoder_length = 7*24
-    # min_encoder_length = 48
+    max_encoder_length = 24*7
+    min_encoder_length = 48
     max_prediction_length = 48
 
     training = TimeSeriesDataSet(
