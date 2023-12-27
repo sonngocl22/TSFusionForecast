@@ -37,7 +37,7 @@ base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 code_dir = os.path.join(base_dir, 'code')
 data_dir = os.path.join(base_dir, 'data')
 results_dir = os.path.join(base_dir, 'results')
-best_params_dir = os.path.join(code_dir, 'best_params_bm14')
+best_params_dir = os.path.join(code_dir, 'best_params_bm7')
 os.makedirs(best_params_dir, exist_ok=True)
 pl.seed_everything(42)
 
@@ -67,7 +67,7 @@ X_train_df, y_train_df, X_test_df, y_test_df = prepare_m4_data(dataset_name="Hou
 unique_ids = y_train_df['unique_id'].unique()
 all_forecasts = {}
 
-results_train_dir = os.path.join(results_dir, 'm4', 'base_model_train_set')
+results_train_dir = os.path.join(results_dir, 'm4', 'base_model_train_set_old')
 # base model forecasts used during training
 df_arima_train = pd.read_csv(os.path.join(results_train_dir, 'y_hat_df_arima_ts.csv'))
 df_theta_train = pd.read_csv(os.path.join(results_train_dir, 'y_hat_df_theta_ts.csv'))
@@ -135,7 +135,7 @@ for unique_id in unique_ids[start_index:end_index]:
                          df_base_models_test[df_base_models_test['unique_id']==unique_id].reset_index(drop=True)], axis=1)
 
     # Create the TimeSeriesDataSet for training
-    max_encoder_length = 48#*7
+    max_encoder_length = 48
     min_encoder_length = 48
     max_prediction_length = 48
 

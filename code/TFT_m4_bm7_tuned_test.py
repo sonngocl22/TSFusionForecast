@@ -38,26 +38,13 @@ code_dir = os.path.join(base_dir, 'code')
 data_dir = os.path.join(base_dir, 'data')
 results_dir = os.path.join(base_dir, 'results')
 best_params_dir = os.path.join(code_dir, 'best_params_bm14')
-os.makedirs(best_params_dir, exist_ok=True)
-pl.seed_everything(42)
+# os.makedirs(best_params_dir, exist_ok=True)
+pl.seed_everything(22)
 
-# parsing arguments (args.job_index and args.total_jobs)
-parser = argparse.ArgumentParser()
-parser.add_argument('--job-index', type=int, required=True, help='Job index number')
-parser.add_argument('--total-jobs', type=int, required=True, help='Total number of jobs')
-args = parser.parse_args()
-
-# tuning parameters
-patience = 50
+# setting parameters
 batch_size = 64
-n_trials = 50
+patience = 50
 max_epochs = 150
-gradient_clip_val_range=(0.1, 1.0)
-hidden_size_range=(5, 150)
-hidden_continuous_size_range=(5, 150)
-attention_head_size_range=(1, 4)
-learning_rate_range=(0.0005, 0.1)
-dropout_range=(0.1, 0.5)
 
 # loading datasets
 X_train_df, y_train_df, X_test_df, y_test_df = prepare_m4_data(dataset_name="Hourly",
@@ -67,7 +54,7 @@ X_train_df, y_train_df, X_test_df, y_test_df = prepare_m4_data(dataset_name="Hou
 unique_ids = y_train_df['unique_id'].unique()
 all_forecasts = {}
 
-results_train_dir = os.path.join(results_dir, 'm4', 'base_model_train_set')
+results_train_dir = os.path.join(results_dir, 'm4', 'base_model_train_set_old')
 # base model forecasts used during training
 df_arima_train = pd.read_csv(os.path.join(results_train_dir, 'y_hat_df_arima_ts.csv'))
 df_theta_train = pd.read_csv(os.path.join(results_train_dir, 'y_hat_df_theta_ts.csv'))
@@ -86,19 +73,8 @@ df_lstm_test = pd.read_csv(os.path.join(results_test_dir, 'y_hat_df_lstm.csv'))
 # getting the most relevant training size
 train_window = len(df_arima_train[df_arima_train['unique_id']=='H1']) # 48*7
 
-# getting job indexes
-total_datasets = len(unique_ids)
-chunk_size = total_datasets // args.total_jobs
-start_index = (args.job_index - 1) * chunk_size
-end_index = start_index + chunk_size
-
-if args.job_index == args.total_jobs:
-    end_index = total_datasets
-
-print(f'start job {args.job_index}: {start_index}')
-print(f'end job {args.job_index}: {end_index}')
-
-for unique_id in unique_ids[start_index:end_index]:
+for unique_id in unique_ids:
+# for unique_id in ['H1','H10']:
 
     print(f'Currently training: {unique_id}')
 
@@ -135,7 +111,7 @@ for unique_id in unique_ids[start_index:end_index]:
                          df_base_models_test[df_base_models_test['unique_id']==unique_id].reset_index(drop=True)], axis=1)
 
     # Create the TimeSeriesDataSet for training
-    max_encoder_length = 48#*7
+    max_encoder_length = 48
     min_encoder_length = 48
     max_prediction_length = 48
 
@@ -173,35 +149,60 @@ for unique_id in unique_ids[start_index:end_index]:
     train_dataloader = training.to_dataloader(train=True, batch_size=batch_size, num_workers=0)
     val_dataloader = validation.to_dataloader(train=False, batch_size=batch_size * 10, num_workers=0)
 
+    # loading the best parameters from best_params folder
+    with open(os.path.join(best_params_dir, f"study_{unique_id}.pkl"), 'rb') as fin:
+        study = pickle.load(fin)
+    best_params = study.best_trial.params
+
     # configure network and trainer
     early_stop_callback = EarlyStopping(monitor="val_loss", min_delta=1e-5, patience=patience, verbose=False, mode="min")
+    lr_logger = LearningRateMonitor()  # log the learning rate
+    logger = TensorBoardLogger("lightning_logs")  # logging results to a tensorboard
 
-    ### TUNING
-    best_params = {}
-    print(f'Tuning has started for {unique_id}...')
-    study = optimize_hyperparameters(
-        train_dataloader,
-        val_dataloader,
-        model_path="optuna_tune_test",
-        n_trials = n_trials,
-        max_epochs = max_epochs,
-        gradient_clip_val_range=gradient_clip_val_range,
-        hidden_size_range=hidden_size_range,
-        hidden_continuous_size_range=hidden_continuous_size_range,
-        attention_head_size_range=attention_head_size_range,
-        learning_rate_range=learning_rate_range,
-        dropout_range=dropout_range,
-        trainer_kwargs=dict(#limit_train_batches=50,
-                            enable_checkpointing=False,
-                            callbacks=[early_stop_callback]),
-        reduce_on_plateau_patience=10,
-        use_learning_rate_finder=False,
+    trainer = pl.Trainer(
+        max_epochs=max_epochs,
+        accelerator="gpu",
+        gradient_clip_val=best_params['gradient_clip_val'],
+        # limit_train_batches=50,  # coment in for training, running valiation every 30 batches
+        # fast_dev_run=True,  # comment in to check that networkor dataset has no serious bugs
+        callbacks=[early_stop_callback],
+        logger=False,
+        enable_model_summary=False,
+        enable_checkpointing=False
     )
 
-    with open(os.path.join(best_params_dir, f"study_{unique_id}.pkl"), "wb") as fout:
-        pickle.dump(study, fout)
+    tft = TemporalFusionTransformer.from_dataset(
+        training,
+        learning_rate=best_params['learning_rate'],
+        hidden_size=best_params['hidden_size'],
+        attention_head_size=best_params['attention_head_size'],
+        dropout=best_params['dropout'],
+        hidden_continuous_size=best_params['hidden_continuous_size'],
+        loss=SMAPE(),
+        # log_interval=10,  # uncomment for learning rate finder and otherwise, e.g. to 10 for logging every 10 batches
+        optimizer="Ranger",
+        reduce_on_plateau_patience=10,
+    )
 
-    print(f'Tuning done! Best params for {unique_id}: ')
-    print(study.best_trial.params)
+    print(best_params)
 
-    ### END TUNING
+    trainer.fit(
+    tft,
+    train_dataloaders=train_dataloader,
+    val_dataloaders=val_dataloader,
+    )
+
+    new_raw_predictions = tft.predict(new_prediction_data, mode="raw", return_x=True, trainer_kwargs=dict(accelerator="gpu"))
+    prediction_array = new_raw_predictions.output.prediction.cpu().numpy().flatten()
+    all_forecasts[unique_id] = prediction_array
+
+    y = y_test_df[y_test_df['unique_id'] == unique_id].y.to_numpy()
+    print(np.sqrt(((y - prediction_array)**2).sum()))
+
+#print(all_forecasts)
+
+results_save_dir = os.path.join(results_dir, 'm4', 'TFT', 'test')
+df_save = pd.DataFrame(all_forecasts).melt()
+df_save.rename(columns={'variable' : 'unique_id', 'value': 'y_hat'}, inplace=True)
+df_save['ds'] = X_test_df['ds']
+df_save.to_csv(os.path.join(results_save_dir, 'y_hat_df_tft_bm14_tuned_final.csv'), index=False)
