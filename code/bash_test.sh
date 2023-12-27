@@ -8,5 +8,5 @@
 #SBATCH --exclude=gpu-120
 
 echo "Start test"
-srun python /home/le004/master_thesis/git/TSFusionForecast/code/TFT_m4_tuned_test.py
+srun python /home/le004/master_thesis/git/TSFusionForecast/code/TFT_m4_bm7_tuned_test.py
 echo "End test"

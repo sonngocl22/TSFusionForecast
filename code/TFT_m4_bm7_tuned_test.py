@@ -37,7 +37,7 @@ base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 code_dir = os.path.join(base_dir, 'code')
 data_dir = os.path.join(base_dir, 'data')
 results_dir = os.path.join(base_dir, 'results')
-best_params_dir = os.path.join(code_dir, 'best_params_bm14')
+best_params_dir = os.path.join(code_dir, 'best_params_bm7')
 # os.makedirs(best_params_dir, exist_ok=True)
 pl.seed_everything(22)
 
@@ -112,7 +112,7 @@ for unique_id in unique_ids:
 
     # Create the TimeSeriesDataSet for training
     max_encoder_length = 48
-    min_encoder_length = 48
+    # min_encoder_length = 48
     max_prediction_length = 48
 
     training = TimeSeriesDataSet(
@@ -205,4 +205,4 @@ results_save_dir = os.path.join(results_dir, 'm4', 'TFT', 'test')
 df_save = pd.DataFrame(all_forecasts).melt()
 df_save.rename(columns={'variable' : 'unique_id', 'value': 'y_hat'}, inplace=True)
 df_save['ds'] = X_test_df['ds']
-df_save.to_csv(os.path.join(results_save_dir, 'y_hat_df_tft_bm14_tuned_final.csv'), index=False)
+df_save.to_csv(os.path.join(results_save_dir, 'y_hat_df_tft_bm7_tuned_final.csv'), index=False)
