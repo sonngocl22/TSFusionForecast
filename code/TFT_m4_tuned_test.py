@@ -111,7 +111,7 @@ for unique_id in unique_ids:
                          df_base_models_test[df_base_models_test['unique_id']==unique_id].reset_index(drop=True)], axis=1)
 
     # Create the TimeSeriesDataSet for training
-    max_encoder_length = 48*7
+    max_encoder_length = 48
     min_encoder_length = 48
     max_prediction_length = 48
 
@@ -121,8 +121,8 @@ for unique_id in unique_ids:
         target="y",
         group_ids=['unique_id'],
         max_encoder_length=max_encoder_length,
-        min_encoder_length=min_encoder_length,
-        # min_encoder_length=max_encoder_length // 2,
+        # min_encoder_length=min_encoder_length,
+        min_encoder_length=max_encoder_length // 2,
         # min_encoder_length=1,
         max_prediction_length=max_prediction_length,
         min_prediction_length=max_prediction_length // 2,

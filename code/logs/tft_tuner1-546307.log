@@ -1,0 +1,168 @@
+
+
+start job 1: 0
+end job 1: 41
+Currently training: H1
+Tuning has started for H1...
+Tuning done! Best params for H1: 
+{'gradient_clip_val': 0.17077649547664342, 'hidden_size': 41, 'dropout': 0.3095093731685956, 'hidden_continuous_size': 11, 'attention_head_size': 3, 'learning_rate': 0.0005221570177644726}
+Currently training: H10
+Tuning has started for H10...
+Tuning done! Best params for H10: 
+{'gradient_clip_val': 0.4729621106155722, 'hidden_size': 87, 'dropout': 0.3468501800897773, 'hidden_continuous_size': 62, 'attention_head_size': 1, 'learning_rate': 0.002796496485862479}
+Currently training: H100
+Tuning has started for H100...
+Tuning done! Best params for H100: 
+{'gradient_clip_val': 0.13720535187547236, 'hidden_size': 5, 'dropout': 0.3887466937937044, 'hidden_continuous_size': 5, 'attention_head_size': 3, 'learning_rate': 0.000895300510859272}
+Currently training: H101
+Tuning has started for H101...
+Tuning done! Best params for H101: 
+{'gradient_clip_val': 0.20479381124784188, 'hidden_size': 64, 'dropout': 0.12609676331266986, 'hidden_continuous_size': 36, 'attention_head_size': 2, 'learning_rate': 0.06995667367208393}
+Currently training: H102
+Tuning has started for H102...
+Tuning done! Best params for H102: 
+{'gradient_clip_val': 0.15883772489947368, 'hidden_size': 37, 'dropout': 0.2511036875328777, 'hidden_continuous_size': 9, 'attention_head_size': 1, 'learning_rate': 0.001088922015919037}
+Currently training: H103
+Tuning has started for H103...
+Tuning done! Best params for H103: 
+{'gradient_clip_val': 0.13788890055032116, 'hidden_size': 5, 'dropout': 0.35200054366133526, 'hidden_continuous_size': 5, 'attention_head_size': 3, 'learning_rate': 0.07080037310510423}
+Currently training: H104
+Tuning has started for H104...
+Tuning done! Best params for H104: 
+{'gradient_clip_val': 0.8033618761143562, 'hidden_size': 84, 'dropout': 0.49038093974303343, 'hidden_continuous_size': 56, 'attention_head_size': 4, 'learning_rate': 0.009924887128313796}
+Currently training: H105
+Tuning has started for H105...
+Tuning done! Best params for H105: 
+{'gradient_clip_val': 0.1236058594147694, 'hidden_size': 98, 'dropout': 0.2158224734102813, 'hidden_continuous_size': 6, 'attention_head_size': 2, 'learning_rate': 0.0013539891391781533}
+Currently training: H106
+Tuning has started for H106...
+Tuning done! Best params for H106: 
+{'gradient_clip_val': 0.10525053472921132, 'hidden_size': 10, 'dropout': 0.2521106619585437, 'hidden_continuous_size': 6, 'attention_head_size': 4, 'learning_rate': 0.0010428100567271385}
+Currently training: H107
+Tuning has started for H107...
+Tuning done! Best params for H107: 
+{'gradient_clip_val': 0.34293217164860007, 'hidden_size': 96, 'dropout': 0.1344118006504738, 'hidden_continuous_size': 40, 'attention_head_size': 3, 'learning_rate': 0.013909615731832184}
+Currently training: H108
+Tuning has started for H108...
+Tuning done! Best params for H108: 
+{'gradient_clip_val': 0.9706841094672792, 'hidden_size': 7, 'dropout': 0.4511581459046601, 'hidden_continuous_size': 5, 'attention_head_size': 3, 'learning_rate': 0.0716629755097593}
+Currently training: H109
+Tuning has started for H109...
+Tuning done! Best params for H109: 
+{'gradient_clip_val': 0.4776779462744325, 'hidden_size': 10, 'dropout': 0.22267890663554213, 'hidden_continuous_size': 5, 'attention_head_size': 1, 'learning_rate': 0.04917068246121002}
+Currently training: H11
+Tuning has started for H11...
+Tuning done! Best params for H11: 
+{'gradient_clip_val': 0.19438741941976537, 'hidden_size': 40, 'dropout': 0.35203353128727544, 'hidden_continuous_size': 34, 'attention_head_size': 2, 'learning_rate': 0.09960168742284567}
+Currently training: H110
+Tuning has started for H110...
+Tuning done! Best params for H110: 
+{'gradient_clip_val': 0.840931162809397, 'hidden_size': 92, 'dropout': 0.2644216467296161, 'hidden_continuous_size': 6, 'attention_head_size': 4, 'learning_rate': 0.05357677810197314}
+Currently training: H111
+Tuning has started for H111...
+Tuning done! Best params for H111: 
+{'gradient_clip_val': 0.26099874977573057, 'hidden_size': 5, 'dropout': 0.16195354062239292, 'hidden_continuous_size': 5, 'attention_head_size': 4, 'learning_rate': 0.057641999630815635}
+Currently training: H112
+Tuning has started for H112...
+Tuning done! Best params for H112: 
+{'gradient_clip_val': 0.38750335675115505, 'hidden_size': 5, 'dropout': 0.4722927503783907, 'hidden_continuous_size': 5, 'attention_head_size': 3, 'learning_rate': 0.000517342867406494}
+Currently training: H113
+Tuning has started for H113...
+Tuning done! Best params for H113: 
+{'gradient_clip_val': 0.9657422934482852, 'hidden_size': 53, 'dropout': 0.3194823770873477, 'hidden_continuous_size': 10, 'attention_head_size': 1, 'learning_rate': 0.08543928936292805}
+Currently training: H114
+Tuning has started for H114...
+Tuning done! Best params for H114: 
+{'gradient_clip_val': 0.3212806432479003, 'hidden_size': 27, 'dropout': 0.1785985228557152, 'hidden_continuous_size': 5, 'attention_head_size': 3, 'learning_rate': 0.0033768744688652567}
+Currently training: H115
+Tuning has started for H115...
+Tuning done! Best params for H115: 
+{'gradient_clip_val': 0.47708606219556887, 'hidden_size': 16, 'dropout': 0.16155824947045244, 'hidden_continuous_size': 13, 'attention_head_size': 1, 'learning_rate': 0.0009315780808219975}
+Currently training: H116
+Tuning has started for H116...
+Tuning done! Best params for H116: 
+{'gradient_clip_val': 0.28069703969249793, 'hidden_size': 40, 'dropout': 0.3967701686566649, 'hidden_continuous_size': 10, 'attention_head_size': 2, 'learning_rate': 0.004780294182488864}
+Currently training: H117
+Tuning has started for H117...
+Tuning done! Best params for H117: 
+{'gradient_clip_val': 0.4140624775045666, 'hidden_size': 126, 'dropout': 0.49834081524702867, 'hidden_continuous_size': 114, 'attention_head_size': 3, 'learning_rate': 0.09962306117837345}
+Currently training: H118
+Tuning has started for H118...
+Tuning done! Best params for H118: 
+{'gradient_clip_val': 0.14641832948101188, 'hidden_size': 85, 'dropout': 0.27858067657355284, 'hidden_continuous_size': 9, 'attention_head_size': 2, 'learning_rate': 0.0729056547723788}
+Currently training: H119
+Tuning has started for H119...
+Tuning done! Best params for H119: 
+{'gradient_clip_val': 0.887123791262186, 'hidden_size': 132, 'dropout': 0.4614399515174208, 'hidden_continuous_size': 120, 'attention_head_size': 1, 'learning_rate': 0.003411441089711652}
+Currently training: H12
+Tuning has started for H12...
+Tuning done! Best params for H12: 
+{'gradient_clip_val': 0.8697358361530063, 'hidden_size': 65, 'dropout': 0.31281310906863125, 'hidden_continuous_size': 9, 'attention_head_size': 1, 'learning_rate': 0.0008848666278229119}
+Currently training: H120
+Tuning has started for H120...
+Tuning done! Best params for H120: 
+{'gradient_clip_val': 0.9335062485306274, 'hidden_size': 5, 'dropout': 0.258583871480909, 'hidden_continuous_size': 5, 'attention_head_size': 3, 'learning_rate': 0.006742530619447822}
+Currently training: H121
+Tuning has started for H121...
+Tuning done! Best params for H121: 
+{'gradient_clip_val': 0.20944201541964005, 'hidden_size': 29, 'dropout': 0.2921506771676422, 'hidden_continuous_size': 12, 'attention_head_size': 2, 'learning_rate': 0.0008025898619636036}
+Currently training: H122
+Tuning has started for H122...
+Tuning done! Best params for H122: 
+{'gradient_clip_val': 0.3916893945576553, 'hidden_size': 6, 'dropout': 0.3652592622901889, 'hidden_continuous_size': 6, 'attention_head_size': 3, 'learning_rate': 0.00910384946454761}
+Currently training: H123
+Tuning has started for H123...
+Tuning done! Best params for H123: 
+{'gradient_clip_val': 0.13199959606079084, 'hidden_size': 21, 'dropout': 0.330936875746154, 'hidden_continuous_size': 7, 'attention_head_size': 2, 'learning_rate': 0.013317179533653717}
+Currently training: H124
+Tuning has started for H124...
+Tuning done! Best params for H124: 
+{'gradient_clip_val': 0.10293298029446248, 'hidden_size': 77, 'dropout': 0.34767495196060616, 'hidden_continuous_size': 34, 'attention_head_size': 1, 'learning_rate': 0.03728451615535166}
+Currently training: H125
+Tuning has started for H125...
+Tuning done! Best params for H125: 
+{'gradient_clip_val': 0.10177088088007574, 'hidden_size': 18, 'dropout': 0.10276716871668708, 'hidden_continuous_size': 8, 'attention_head_size': 1, 'learning_rate': 0.0006831749586920013}
+Currently training: H126
+Tuning has started for H126...
+Tuning done! Best params for H126: 
+{'gradient_clip_val': 0.949359661962368, 'hidden_size': 57, 'dropout': 0.4264312218410279, 'hidden_continuous_size': 30, 'attention_head_size': 2, 'learning_rate': 0.014420005021908546}
+Currently training: H127
+Tuning has started for H127...
+Tuning done! Best params for H127: 
+{'gradient_clip_val': 0.4306670404342985, 'hidden_size': 7, 'dropout': 0.19574233360440885, 'hidden_continuous_size': 5, 'attention_head_size': 3, 'learning_rate': 0.001046537398775304}
+Currently training: H128
+Tuning has started for H128...
+Tuning done! Best params for H128: 
+{'gradient_clip_val': 0.1549553181775699, 'hidden_size': 140, 'dropout': 0.23218636468335174, 'hidden_continuous_size': 13, 'attention_head_size': 3, 'learning_rate': 0.01756266270208713}
+Currently training: H129
+Tuning has started for H129...
+Tuning done! Best params for H129: 
+{'gradient_clip_val': 0.14832314721302517, 'hidden_size': 144, 'dropout': 0.1268388074701785, 'hidden_continuous_size': 140, 'attention_head_size': 3, 'learning_rate': 0.027756910998880526}
+Currently training: H13
+Tuning has started for H13...
+Tuning done! Best params for H13: 
+{'gradient_clip_val': 0.8209647257171072, 'hidden_size': 8, 'dropout': 0.42320030996242886, 'hidden_continuous_size': 6, 'attention_head_size': 4, 'learning_rate': 0.008067446586228513}
+Currently training: H130
+Tuning has started for H130...
+Tuning done! Best params for H130: 
+{'gradient_clip_val': 0.3792262510018015, 'hidden_size': 75, 'dropout': 0.1862186571820318, 'hidden_continuous_size': 13, 'attention_head_size': 3, 'learning_rate': 0.0736891937074906}
+Currently training: H131
+Tuning has started for H131...
+Tuning done! Best params for H131: 
+{'gradient_clip_val': 0.3126838488643904, 'hidden_size': 45, 'dropout': 0.4859949172480732, 'hidden_continuous_size': 13, 'attention_head_size': 4, 'learning_rate': 0.0016745123559580694}
+Currently training: H132
+Tuning has started for H132...
+Tuning done! Best params for H132: 
+{'gradient_clip_val': 0.457448142156236, 'hidden_size': 12, 'dropout': 0.4258921411890836, 'hidden_continuous_size': 9, 'attention_head_size': 2, 'learning_rate': 0.0034752487846806592}
+Currently training: H133
+Tuning has started for H133...
+Tuning done! Best params for H133: 
+{'gradient_clip_val': 0.9413543642768994, 'hidden_size': 5, 'dropout': 0.48941744943298104, 'hidden_continuous_size': 5, 'attention_head_size': 4, 'learning_rate': 0.008466460078090727}
+Currently training: H134
+Tuning has started for H134...
+Tuning done! Best params for H134: 
+{'gradient_clip_val': 0.6736889294407826, 'hidden_size': 107, 'dropout': 0.4800733704777648, 'hidden_continuous_size': 18, 'attention_head_size': 2, 'learning_rate': 0.07859821142051525}
+Currently training: H135
+Tuning has started for H135...
+Tuning done! Best params for H135: 
+{'gradient_clip_val': 0.2142242246026661, 'hidden_size': 84, 'dropout': 0.45339286727935557, 'hidden_continuous_size': 8, 'attention_head_size': 2, 'learning_rate': 0.009216882863063944}
