@@ -167,7 +167,7 @@ sequences_dict = create_sequences(train_val_dict['train_set'][feature_variable],
 def objective(trial):
 
     # Hyperparameters to tune
-    learning_rate = trial.suggest_float("learning_rate", 1e-4, 1e-1, log=True)
+    learning_rate = trial.suggest_float("learning_rate", 1e-5, 1e-1, log=True)
     hidden_size = trial.suggest_int("hidden_size", 5, 50, step=5)
     num_layers = trial.suggest_int("num_layers", 1, 12)
     batch_size = trial.suggest_categorical("batch_size", [32, 64, 128])
@@ -224,10 +224,17 @@ else:
 ### Finished tuning hyperparameters
 
 # creating data slices to generate forecasts for the next 8 days
-index_cutoffs = [24*i for i in range(7, -1, -1)]
+# index_cutoffs = [24*i for i in range(7, -1, -1)]
+# train_df_list = [train_df.iloc[:-idx] if idx != 0 else train_df for idx in index_cutoffs]
+# index_ceiling = [x.index.stop for x in train_df_list]
+# test_df_list = [train_df['price_de'].iloc[idx:idx+step_size] if idx!=index_ceiling[-1] else test_df['price_de'] for idx in index_ceiling]
+    
+# creating data slices to generate forecasts for the next 15 days
+index_cutoffs = [24*i for i in range(14, -1, -1)]
 train_df_list = [train_df.iloc[:-idx] if idx != 0 else train_df for idx in index_cutoffs]
 index_ceiling = [x.index.stop for x in train_df_list]
 test_df_list = [train_df['price_de'].iloc[idx:idx+step_size] if idx!=index_ceiling[-1] else test_df['price_de'] for idx in index_ceiling]
+
 y_hat_full = np.empty((0, 1))
 
 for i, train_df_slice in enumerate(train_df_list):
@@ -266,7 +273,7 @@ for i, train_df_slice in enumerate(train_df_list):
 
 # save the forecasts
 y_hat_df = pd.DataFrame({'y_hat_lstm': y_hat_full.flatten()})
-y_hat_df.to_csv(os.path.join(elec_dir, 'base_models_ts', 'y_hat_df_lstm.csv'), index=False)
+y_hat_df.to_csv(os.path.join(elec_dir, 'base_models_ts', 'y_hat_df_lstm_bm14.csv'), index=False)
 
 # asserting that the length of the forecast is correct
 print(f'y_hat length: {len(y_hat_full)} vs correct length: {params["seq_length"] + params["target_seq_length"]}')

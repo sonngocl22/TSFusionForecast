@@ -211,10 +211,17 @@ hyperparameters = {
     # # "selected_features": [target_variable]  # Features selected for training the model
 }
 # creating data slices to generate forecasts for the next 8 days
-index_cutoffs = [24*i for i in range(7, -1, -1)]
+# index_cutoffs = [24*i for i in range(7, -1, -1)]
+# train_df_list = [train_df.iloc[:-idx] if idx != 0 else train_df for idx in index_cutoffs]
+# index_ceiling = [x.index.stop for x in train_df_list]
+# test_df_list = [train_df['price_de'].iloc[idx:idx+hyperparameters['step_size']] if idx!=index_ceiling[-1] else test_df['price_de'] for idx in index_ceiling]
+
+# creating data slices to generate forecasts for the next 15 days
+index_cutoffs = [24*i for i in range(14, -1, -1)]
 train_df_list = [train_df.iloc[:-idx] if idx != 0 else train_df for idx in index_cutoffs]
 index_ceiling = [x.index.stop for x in train_df_list]
 test_df_list = [train_df['price_de'].iloc[idx:idx+hyperparameters['step_size']] if idx!=index_ceiling[-1] else test_df['price_de'] for idx in index_ceiling]
+
 y_hat_full = np.empty((0, 1))
 
 for i, train_df_slice in enumerate(train_df_list):
