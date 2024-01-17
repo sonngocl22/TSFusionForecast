@@ -47,7 +47,7 @@ feature_variable = test_df.drop(columns='datetime_utc').columns
 target_variable = 'price_de'
 timestemp_col = 'datetime_utc'
 step_size = 24
-pl.seed_everything(863)
+pl.seed_everything(22)
 
 params = {
     "seq_length": 24 * 14,             # Sequence length
@@ -58,9 +58,9 @@ params = {
 }
 
 # tuning parameters
-patience = 15
+patience = 100
 n_trials = 120
-max_epochs = 100
+max_epochs = 89
 gradient_clip_val_range=(0.1, 20.0)
 hidden_size_range=(15, 200)
 hidden_continuous_size_range=(5, 50)
@@ -68,6 +68,9 @@ attention_head_size_range=(1, 4)
 learning_rate_range=(0.0005, 0.1)
 dropout_range=(0.1, 0.6)
 
+
+# bm14 - with only noise (no dlin) (bm7 test)
+# [15.848, 32.90, 31.496, 19.707, 24.221, 36.8916]
 
 # bm7 (no dlin) (all bm7)
 # pl.seed_everything(22)
@@ -89,9 +92,9 @@ dropout_range=(0.1, 0.6)
 
 # bm14 (no dlin) (all bm14) (bm7 test)
 # pl.seed_everything(22)
-# [5.913, 7.2709, 6.5219, 8.029]
-# patience =  (15 for seeding)
-# max_epochs = 52 (100 for seeding)
+# 5.913
+# patience =  (til end)
+# max_epochs = 52
 # max_encoder_length = 24 (no min)
 # reduce_on_plateau_patience=15
 # batch_size = 128
@@ -104,6 +107,9 @@ dropout_range=(0.1, 0.6)
 # max_encoder_length = 24 (no min)
 # reduce_on_plateau_patience=15 (5 for seeding)
 # batch_size = 128
+
+
+
 
 # loading base model forecasts as train and test sets of bm7 for the test set
 y_hat_xgb_bm7 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_xgb_bm7.csv'))
@@ -128,11 +134,17 @@ y_hat_lstm_bm14 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_lstm_bm14.c
 # train_df_xgb = train_df_lgb = train_df_gru = train_df_lstm = train_df[[timestemp_col]].iloc[-params['seq_length']:].copy()
 train_df_ts = train_df[[timestemp_col]].iloc[-params['seq_length']:].copy()
 
-train_df_ts['y_hat_xgb'] = y_hat_xgb_bm14['y_hat_xgb'].iloc[:-params['target_seq_length']].values
-train_df_ts['y_hat_lgb'] = y_hat_lgb_bm14['y_hat_lgb'].iloc[:-params['target_seq_length']].values
-train_df_ts['y_hat_gru'] = y_hat_gru_bm14['y_hat_gru'].iloc[:-params['target_seq_length']].values
-train_df_ts['y_hat_lstm'] = y_hat_lstm_bm14['y_hat_lstm'].iloc[:-params['target_seq_length']].values
+# train_df_ts['y_hat_xgb'] = y_hat_xgb_bm14['y_hat_xgb'].iloc[:-params['target_seq_length']].values
+# train_df_ts['y_hat_lgb'] = y_hat_lgb_bm14['y_hat_lgb'].iloc[:-params['target_seq_length']].values
+# train_df_ts['y_hat_gru'] = y_hat_gru_bm14['y_hat_gru'].iloc[:-params['target_seq_length']].values
+# train_df_ts['y_hat_lstm'] = y_hat_lstm_bm14['y_hat_lstm'].iloc[:-params['target_seq_length']].values
 # train_df_ts['y_hat_dlin'] = y_hat_dlin['y_hat_dlin'].iloc[:-params['target_seq_length']].values
+
+
+train_df_ts['y_hat_xgb'] = np.random.normal(0, 1, size=len(train_df_ts))
+train_df_ts['y_hat_lgb'] = np.random.normal(0, 1, size=len(train_df_ts))
+train_df_ts['y_hat_gru'] = np.random.normal(0, 1, size=len(train_df_ts))
+train_df_ts['y_hat_lstm'] = np.random.normal(0, 1, size=len(train_df_ts))
 
 # filling half the dataset with old bm7 values
 # train_df_ts['y_hat_xgb'].iloc[-24*7:] = y_hat_xgb_bm7['y_hat_xgb'].iloc[:-params['target_seq_length']].values
@@ -147,9 +159,9 @@ train_df_ts['datetime_utc'] = (train_df_ts['datetime_utc'] - train_df_ts['dateti
 train_df_ts['datetime_utc'] = train_df_ts['datetime_utc'].astype(int)
 train_df_ts['unique_id'] = 'H1'
 
-# unknown_cov = train_df.drop(columns=['datetime_utc','price_de']).iloc[-params['seq_length']:]
-# unknown_cov_cols = unknown_cov.columns
-# train_df_ts = pd.concat([train_df_ts, unknown_cov], axis = 1)
+unknown_cov = train_df.drop(columns=['datetime_utc','price_de']).iloc[-params['seq_length']:]
+unknown_cov_cols = unknown_cov.columns
+train_df_ts = pd.concat([train_df_ts, unknown_cov], axis = 1)
 
 
 # creating test dataset
@@ -238,7 +250,7 @@ training = TimeSeriesDataSet(
     min_prediction_length=max_prediction_length // 2,
     # min_prediction_length=1,
     time_varying_known_reals=['y_hat_xgb', 'y_hat_lgb', 'y_hat_gru', 'y_hat_lstm'],  # Base model forecasts
-    # time_varying_unknown_reals=list(unknown_cov_cols),
+    time_varying_unknown_reals=list(unknown_cov_cols),
     target_normalizer=GroupNormalizer(
         groups=["unique_id"], transformation="softplus"
     ),
@@ -255,7 +267,7 @@ early_stop_callback = EarlyStopping(monitor="val_loss", min_delta=1e-5, patience
 # creating the test data that includes the encoder and decoder data
 encoder_data = train_df_ts[lambda x: x.datetime_utc > x.datetime_utc.max() - max_encoder_length]
 test_df_ts.y = train_df_ts.y[train_df_ts.datetime_utc == train_df_ts.datetime_utc.max()].values[0]
-# test_df_ts[list(unknown_cov_cols)] = train_df_ts[list(unknown_cov_cols)][train_df_ts.datetime_utc == train_df_ts.datetime_utc.max()].values[0]
+test_df_ts[list(unknown_cov_cols)] = train_df_ts[list(unknown_cov_cols)][train_df_ts.datetime_utc == train_df_ts.datetime_utc.max()].values[0]
 decoder_data = test_df_ts
 new_prediction_data = pd.concat([encoder_data, decoder_data], ignore_index=True)
 
@@ -268,9 +280,9 @@ early_stop_callback = EarlyStopping(monitor="val_loss", min_delta=1e-5, patience
 
 ### TUNING
 
-if os.path.exists(os.path.join(elec_dir, 'best_params', 'best_params_tft_bm14.pkl')):
+if os.path.exists(os.path.join(elec_dir, 'best_params', 'best_params_tft.pkl')):
     print('Loading best params...')
-    with open(os.path.join(elec_dir, 'best_params', 'best_params_tft_bm14.pkl'), 'rb') as fin:
+    with open(os.path.join(elec_dir, 'best_params', 'best_params_tft.pkl'), 'rb') as fin:
         study = pickle.load(fin)
         best_params = study.best_trial.params
 
@@ -300,7 +312,7 @@ else:
 
     best_params = study.best_trial.params
 
-    with open(os.path.join(elec_dir, 'best_params', 'best_params_tft_bm14.pkl'), 'wb') as fout:
+    with open(os.path.join(elec_dir, 'best_params', 'best_params_tft.pkl'), 'wb') as fout:
         pickle.dump(study, fout)
 
     print('Best trial: score {}, params {}'.format(study.best_trial.value, study.best_trial.params))
@@ -331,7 +343,7 @@ tft = TemporalFusionTransformer.from_dataset(
     loss=SMAPE(),
     # log_interval=10,  # uncomment for learning rate finder and otherwise, e.g. to 10 for logging every 10 batches
     optimizer="Ranger",
-    reduce_on_plateau_patience=5,
+    reduce_on_plateau_patience=15,
 )
 
 print(best_params)
@@ -348,3 +360,6 @@ print(new_raw_predictions.output.prediction.cpu().numpy().flatten())
 print(test_df['price_de'].values)
 
 print(smape_loss(new_raw_predictions.output.prediction.cpu().numpy().flatten(), test_df['price_de'].values))
+
+
+

@@ -47,7 +47,7 @@ feature_variable = test_df.drop(columns='datetime_utc').columns
 target_variable = 'price_de'
 timestemp_col = 'datetime_utc'
 step_size = 24
-pl.seed_everything(1347)
+pl.seed_everything(22)
 
 params = {
     "seq_length": 24 * 14,             # Sequence length
@@ -58,9 +58,9 @@ params = {
 }
 
 # tuning parameters
-patience = 18
+patience = 100
 n_trials = 120
-max_epochs = 100
+max_epochs = 89
 gradient_clip_val_range=(0.1, 20.0)
 hidden_size_range=(15, 200)
 hidden_continuous_size_range=(5, 50)
@@ -98,7 +98,7 @@ dropout_range=(0.1, 0.6)
 
 # bm14+cov (no dlin)
 # pl.seed_everything(22)
-# [5.681, 6.4581, 7.427, 6.9065, 6.5754]
+# [5.681, 6.4581, 7.427, 6.9065, 6.5754, 4.7578, 6.74012, 5.7789, 9.733, 5.0480, 6.1320, 5.288, 7.162]
 # patience = 100 (18 for seeding)
 # max_epochs = 89 (100 for seeding)
 # max_encoder_length = 24 (no min)
@@ -334,7 +334,7 @@ tft = TemporalFusionTransformer.from_dataset(
     loss=SMAPE(),
     # log_interval=10,  # uncomment for learning rate finder and otherwise, e.g. to 10 for logging every 10 batches
     optimizer="Ranger",
-    reduce_on_plateau_patience=5,
+    reduce_on_plateau_patience=15,
 )
 
 print(best_params)
@@ -352,5 +352,11 @@ print(test_df['price_de'].values)
 
 print(smape_loss(new_raw_predictions.output.prediction.cpu().numpy().flatten(), test_df['price_de'].values))
 
+interpretation = tft.interpret_output(new_raw_predictions.output, reduction="sum")
+tft.plot_interpretation(interpretation)
+
+
+# y_hat_df = pd.DataFrame({'y_hat_gru': new_raw_predictions.output.prediction.cpu().numpy().flatten()})
+# y_hat_df.to_csv(os.path.join(elec_dir, 'final_forecasts', 'TFT_bm14_wcov_pred.csv'), index=False)
 
 

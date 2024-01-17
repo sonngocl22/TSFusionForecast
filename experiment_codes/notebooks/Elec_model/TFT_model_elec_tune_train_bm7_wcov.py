@@ -47,10 +47,10 @@ feature_variable = test_df.drop(columns='datetime_utc').columns
 target_variable = 'price_de'
 timestemp_col = 'datetime_utc'
 step_size = 24
-pl.seed_everything(16)
+pl.seed_everything(3624)
 
 params = {
-    "seq_length": 24 * 14,             # Sequence length
+    "seq_length": 24 * 7,             # Sequence length
     "target_seq_length": 24,          # Target sequence length for forecasting
     "input_size": len(feature_variable),     # Input size
     "output_size": len(feature_variable),                 # Output size
@@ -58,19 +58,15 @@ params = {
 }
 
 # tuning parameters
-patience = 3
+patience = 65
 n_trials = 120
-max_epochs = 10
+max_epochs = 65
 gradient_clip_val_range=(0.1, 20.0)
 hidden_size_range=(15, 200)
 hidden_continuous_size_range=(5, 50)
 attention_head_size_range=(1, 4)
 learning_rate_range=(0.0005, 0.1)
 dropout_range=(0.1, 0.6)
-
-
-# bm14 - with only noise (no dlin) (bm7 test)
-# [15.848, 32.90, 31.496, 19.707, 24.221, 36.8916]
 
 # bm7 (no dlin) (all bm7)
 # pl.seed_everything(22)
@@ -83,20 +79,21 @@ dropout_range=(0.1, 0.6)
 
 # bm7+cov (no dlin) (all bm7)
 # pl.seed_everything(22)
-# 6.288
-# patience = 65 (till 64)
-# max_epochs = 65
+# [6.288, 8.481, 6.696, 8.764, 7.532]
+# [6.288, 7.6014, 7.7741, 6.869, 6.135, 6.5162, 5.8028, 6.6600, 8.1590]
+# patience = 65 (15 for seeding)
+# max_epochs = 65 (100 for seeding)
 # max_encoder_length = 24 (no min)
-# reduce_on_plateau_patience=15
+# reduce_on_plateau_patience=15 (5 for seeding)
 # batch_size = 128
 
 # bm14 (no dlin) (all bm14) (bm7 test)
 # pl.seed_everything(22)
-# 5.913
-# patience =  (til end)
-# max_epochs = 52
+# [5.913, 7.2709, 6.5219, 8.029]
+# patience =  (15 for seeding)
+# max_epochs = 52 (100 for seeding)
 # max_encoder_length = 24 (no min)
-# reduce_on_plateau_patience=15
+# reduce_on_plateau_patience=15 (5 for seeding)
 # batch_size = 128
 
 # bm14+cov (no dlin)
@@ -109,49 +106,22 @@ dropout_range=(0.1, 0.6)
 # batch_size = 128
 
 
-
-
-# loading base model forecasts as train and test sets of bm7 for the test set
-y_hat_xgb_bm7 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_xgb_bm7.csv'))
-y_hat_lgb_bm7 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_lgb_bm7.csv'))
-y_hat_gru_bm7 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_gru_bm7.csv'))
-y_hat_lstm_bm7 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_lstm_bm7.csv'))
-# y_hat_dlin_bm7 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_dlin_bm7.csv'))
-
-# train_df_temp = train_df[[timestemp_col]].iloc[-params['seq_length']:].copy()
-# train_df_temp['datetime_utc'] = pd.to_datetime(train_df_temp['datetime_utc'])
-# train_df_temp['datetime_utc'] = (train_df_temp['datetime_utc'] - train_df_temp['datetime_utc'].min()).dt.total_seconds() // 3600 + 1 #df_train_val['ds'].max() + 1
-# train_df_temp['datetime_utc'] = train_df_temp['datetime_utc'].astype(int)
-
-# loading base model forecasts as train and test sets of bm14
-y_hat_xgb_bm14 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_xgb_bm14.csv'))
-y_hat_lgb_bm14 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_lgb_bm14.csv'))
-y_hat_gru_bm14 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_gru_bm14.csv'))
-y_hat_lstm_bm14 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_lstm_bm14.csv'))
-# y_hat_dlin_bm14 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_dlin_bm14.csv'))
+# loading base model forecasts as train and test sets
+y_hat_xgb = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_xgb_bm7.csv'))
+y_hat_lgb = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_lgb_bm7.csv'))
+y_hat_gru = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_gru_bm7.csv'))
+y_hat_lstm = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_lstm_bm7.csv'))
+y_hat_dlin = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_dlin_bm7.csv'))
 
 # creating train and val datasets
 # train_df_xgb = train_df_lgb = train_df_gru = train_df_lstm = train_df[[timestemp_col]].iloc[-params['seq_length']:].copy()
 train_df_ts = train_df[[timestemp_col]].iloc[-params['seq_length']:].copy()
 
-# train_df_ts['y_hat_xgb'] = y_hat_xgb_bm14['y_hat_xgb'].iloc[:-params['target_seq_length']].values
-# train_df_ts['y_hat_lgb'] = y_hat_lgb_bm14['y_hat_lgb'].iloc[:-params['target_seq_length']].values
-# train_df_ts['y_hat_gru'] = y_hat_gru_bm14['y_hat_gru'].iloc[:-params['target_seq_length']].values
-# train_df_ts['y_hat_lstm'] = y_hat_lstm_bm14['y_hat_lstm'].iloc[:-params['target_seq_length']].values
+train_df_ts['y_hat_xgb'] = y_hat_xgb['y_hat_xgb'].iloc[:-params['target_seq_length']].values
+train_df_ts['y_hat_lgb'] = y_hat_lgb['y_hat_lgb'].iloc[:-params['target_seq_length']].values
+train_df_ts['y_hat_gru'] = y_hat_gru['y_hat_gru'].iloc[:-params['target_seq_length']].values
+train_df_ts['y_hat_lstm'] = y_hat_lstm['y_hat_lstm'].iloc[:-params['target_seq_length']].values
 # train_df_ts['y_hat_dlin'] = y_hat_dlin['y_hat_dlin'].iloc[:-params['target_seq_length']].values
-
-
-train_df_ts['y_hat_xgb'] = np.random.normal(0, 1, size=len(train_df_ts))
-train_df_ts['y_hat_lgb'] = np.random.normal(0, 1, size=len(train_df_ts))
-train_df_ts['y_hat_gru'] = np.random.normal(0, 1, size=len(train_df_ts))
-train_df_ts['y_hat_lstm'] = np.random.normal(0, 1, size=len(train_df_ts))
-
-# filling half the dataset with old bm7 values
-# train_df_ts['y_hat_xgb'].iloc[-24*7:] = y_hat_xgb_bm7['y_hat_xgb'].iloc[:-params['target_seq_length']].values
-# train_df_ts['y_hat_lgb'].iloc[-24*7:] = y_hat_lgb_bm7['y_hat_lgb'].iloc[:-params['target_seq_length']].values
-# train_df_ts['y_hat_gru'].iloc[-24*7:] = y_hat_gru_bm7['y_hat_gru'].iloc[:-params['target_seq_length']].values
-# train_df_ts['y_hat_lstm'].iloc[-24*7:] = y_hat_lstm_bm7['y_hat_lstm'].iloc[:-params['target_seq_length']].values
-
 train_df_ts['y'] = train_df['price_de'].iloc[-params['seq_length']:].values
 
 train_df_ts['datetime_utc'] = pd.to_datetime(train_df_ts['datetime_utc'])
@@ -159,19 +129,18 @@ train_df_ts['datetime_utc'] = (train_df_ts['datetime_utc'] - train_df_ts['dateti
 train_df_ts['datetime_utc'] = train_df_ts['datetime_utc'].astype(int)
 train_df_ts['unique_id'] = 'H1'
 
-unknown_cov = train_df.drop(columns=['datetime_utc','price_de']).iloc[-params['seq_length']:]
+unknown_cov = train_df.drop(columns=['datetime_utc','price_de']).iloc[-24*7:]
 unknown_cov_cols = unknown_cov.columns
 train_df_ts = pd.concat([train_df_ts, unknown_cov], axis = 1)
-
 
 # creating test dataset
 # test_df_xgb = test_df_lgb = test_df_gru = test_df_lstm = test_df[[timestemp_col]].copy()
 test_df_ts = test_df[[timestemp_col]].copy()
 
-test_df_ts['y_hat_xgb'] = y_hat_xgb_bm7['y_hat_xgb'].iloc[-params['target_seq_length']:].values
-test_df_ts['y_hat_lgb'] = y_hat_lgb_bm7['y_hat_lgb'].iloc[-params['target_seq_length']:].values
-test_df_ts['y_hat_gru'] = y_hat_gru_bm7['y_hat_gru'].iloc[-params['target_seq_length']:].values
-test_df_ts['y_hat_lstm'] = y_hat_lstm_bm7['y_hat_lstm'].iloc[-params['target_seq_length']:].values
+test_df_ts['y_hat_xgb'] = y_hat_xgb['y_hat_xgb'].iloc[-params['target_seq_length']:].values
+test_df_ts['y_hat_lgb'] = y_hat_lgb['y_hat_lgb'].iloc[-params['target_seq_length']:].values
+test_df_ts['y_hat_gru'] = y_hat_gru['y_hat_gru'].iloc[-params['target_seq_length']:].values
+test_df_ts['y_hat_lstm'] = y_hat_lstm['y_hat_lstm'].iloc[-params['target_seq_length']:].values
 # test_df_ts['y_hat_dlin'] = y_hat_dlin['y_hat_dlin'].iloc[-params['target_seq_length']:].values
 test_df_ts['y'] = test_df['price_de'].values
 
@@ -179,34 +148,6 @@ test_df_ts['datetime_utc'] = pd.to_datetime(test_df_ts['datetime_utc'])
 test_df_ts['datetime_utc'] = (test_df_ts['datetime_utc'] - test_df_ts['datetime_utc'].min()).dt.total_seconds() // 3600 + train_df_ts['datetime_utc'].max() + 1
 test_df_ts['datetime_utc'] = test_df_ts['datetime_utc'].astype(int)
 test_df_ts['unique_id'] = 'H1'
-
-
-# # loading base model forecasts as train and test sets of bm14
-# y_hat_xgb_bm14 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_xgb_bm14.csv'))
-# y_hat_lgb_bm14 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_lgb_bm14.csv'))
-# y_hat_gru_bm14 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_gru_bm14.csv'))
-# y_hat_lstm_bm14 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_lstm_bm14.csv'))
-# y_hat_dlin_bm14 = pd.read_csv(os.path.join(base_models_ts, 'y_hat_df_dlin_bm14.csv'))
-
-# # creating train and val datasets
-# # train_df_xgb = train_df_lgb = train_df_gru = train_df_lstm = train_df[[timestemp_col]].iloc[-params['seq_length']:].copy()
-# train_df_ts = train_df[[timestemp_col]].iloc[-params['seq_length']:].copy()
-
-# train_df_ts['y_hat_xgb'] = y_hat_xgb_bm14['y_hat_xgb'].iloc[:-params['target_seq_length']].values
-# train_df_ts['y_hat_lgb'] = y_hat_lgb_bm14['y_hat_lgb'].iloc[:-params['target_seq_length']].values
-# train_df_ts['y_hat_gru'] = y_hat_gru_bm14['y_hat_gru'].iloc[:-params['target_seq_length']].values
-# train_df_ts['y_hat_lstm'] = y_hat_lstm_bm14['y_hat_lstm'].iloc[:-params['target_seq_length']].values
-# # train_df_ts['y_hat_dlin'] = y_hat_dlin['y_hat_dlin'].iloc[:-params['target_seq_length']].values
-# train_df_ts['y'] = train_df['price_de'].iloc[-params['seq_length']:].values
-
-# train_df_ts['datetime_utc'] = pd.to_datetime(train_df_ts['datetime_utc'])
-# train_df_ts['datetime_utc'] = (train_df_ts['datetime_utc'] - train_df_ts['datetime_utc'].min()).dt.total_seconds() // 3600 + 1 #df_train_val['ds'].max() + 1
-# train_df_ts['datetime_utc'] = train_df_ts['datetime_utc'].astype(int)
-# train_df_ts['unique_id'] = 'H1'
-
-# unknown_cov = train_df.drop(columns=['datetime_utc','price_de']).iloc[-params['seq_length']:]
-# unknown_cov_cols = unknown_cov.columns
-# train_df_ts = pd.concat([train_df_ts, unknown_cov], axis = 1)
 
 
 print(train_df_ts.shape)
@@ -343,7 +284,7 @@ tft = TemporalFusionTransformer.from_dataset(
     loss=SMAPE(),
     # log_interval=10,  # uncomment for learning rate finder and otherwise, e.g. to 10 for logging every 10 batches
     optimizer="Ranger",
-    reduce_on_plateau_patience=5,
+    reduce_on_plateau_patience=15,
 )
 
 print(best_params)
@@ -360,6 +301,3 @@ print(new_raw_predictions.output.prediction.cpu().numpy().flatten())
 print(test_df['price_de'].values)
 
 print(smape_loss(new_raw_predictions.output.prediction.cpu().numpy().flatten(), test_df['price_de'].values))
-
-
-
