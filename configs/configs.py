@@ -56,6 +56,23 @@ LSTM_TUNING_PARAMS = {
     "dropout": (0.1, 0.5),
 }
 
+TFT_TUNING_PARAMS = {
+    "max_encoder_length": 24,
+    "max_prediction_length": 24,
+    "patience": 50, #30
+    "max_epochs": 200, #100
+    "batch_size": 128,
+    "n_trials": 100,
+    "reduce_on_plateau_patience": 14,
+    "gradient_clip_val": (0.1, 20.0),
+    "hidden_size_range": (15, 200),
+    "hidden_continuous_size": (5, 50),
+    "attention_head_size_range": (1, 4),
+    "learning_rate_range": (5e-4, 1e-1),
+    "dropout_range": (0.1, 0.6)
+
+}
+
 SEED = 42
 
 TEST = True

@@ -71,7 +71,6 @@ class XGBoostModel(BaseModel):
         Obtaining the x_train and y_train used for model training from the training set.
 
         :param file_path: path to load the data
-        :return:
         """
         self.train_df = pd.read_csv(os.path.join(file_path, 'train_df.csv'))
         self.test_df = pd.read_csv(os.path.join(file_path, 'test_df.csv'))

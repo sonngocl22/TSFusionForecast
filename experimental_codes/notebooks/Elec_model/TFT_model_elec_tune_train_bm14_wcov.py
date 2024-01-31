@@ -253,7 +253,7 @@ training = TimeSeriesDataSet(
 
 validation = TimeSeriesDataSet.from_dataset(training, train_df_ts, predict=True, stop_randomization=True)
 
-early_stop_callback = EarlyStopping(monitor="val_loss", min_delta=1e-5, patience=50, verbose=False, mode="min")
+# early_stop_callback = EarlyStopping(monitor="val_loss", min_delta=1e-5, patience=50, verbose=False, mode="min")
 
 # creating the test data that includes the encoder and decoder data
 encoder_data = train_df_ts[lambda x: x.datetime_utc > x.datetime_utc.max() - max_encoder_length]
