@@ -1,0 +1,1 @@
+C:\Users\sonng\Documents\GitHub\master_thesis\TSFusionForecast\models\meta_model\my_checkpoints\epoch=126-step=254.ckpt
